@@ -16,8 +16,8 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
-  const verificationChannelId = 'ID_OF_VERIFICATION_CHANNEL';
-  const logChannelId = 'ID_OF_LOG_CHANNEL';
+  const verificationChannelId = '1354860576429576404';
+  const logChannelId = '1355887364920316125';
 
   if (message.channel.id !== verificationChannelId) return;
   if (message.author.bot) return;
