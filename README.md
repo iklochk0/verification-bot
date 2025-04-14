@@ -1,0 +1,2 @@
+# verification-bot
+1
