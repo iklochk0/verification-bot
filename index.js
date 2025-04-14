@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
-require('dotenv').config(); // якщо використовуєш .env для токена
+require('dotenv').config(); // Load token from .env
 
 const client = new Client({
   intents: [
@@ -8,16 +8,16 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages
   ],
-  partials: ['CHANNEL'] // щоб працювали DM
+  partials: ['CHANNEL'] // Required to handle DMs
 });
 
 client.on('ready', () => {
-  console.log(`Бот запущений як ${client.user.tag}`);
+  console.log(`Bot is running as ${client.user.tag}`);
 });
 
 client.on('messageCreate', async (message) => {
-  const verificationChannelId = 'ID_ВЕРИФІКАЦІЙНОГО_КАНАЛУ';
-  const logChannelId = 'ID_АДМІН_ЛОГ_КАНАЛУ';
+  const verificationChannelId = 'ID_OF_VERIFICATION_CHANNEL';
+  const logChannelId = 'ID_OF_LOG_CHANNEL';
 
   if (message.channel.id !== verificationChannelId) return;
   if (message.author.bot) return;
@@ -30,25 +30,25 @@ client.on('messageCreate', async (message) => {
       const attachments = Array.from(message.attachments.values());
       await message.delete();
 
-      // DM користувачу
+      // Send a DM to the user
       await message.author.send(
-        `Привіт! У верифікаційному каналі дозволено надсилати **лише скріншоти без тексту**. Будь ласка, спробуй ще раз.`
+        `Hi! Only **screenshots without text** are allowed in the verification channel. Please try again.`
       );
 
-      // Embed лог
+      // Log message for admins
       const embed = new EmbedBuilder()
-        .setTitle('Некоректне повідомлення у верифікації')
+        .setTitle('Invalid Message in Verification Channel')
         .setColor(0xff0000)
         .setAuthor({
           name: `${message.author.tag}`,
           iconURL: message.author.displayAvatarURL({ dynamic: true })
         })
         .addFields(
-          { name: 'Користувач', value: `<@${message.author.id}> (${message.author.id})`, inline: false },
-          { name: 'Час', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
-          { name: 'Було порушено', value: [
-              hasText ? '– Надіслано текст разом із зображенням.' : '',
-              !hasImage ? '– Відсутні прикріплені зображення.' : ''
+          { name: 'User', value: `<@${message.author.id}> (${message.author.id})`, inline: false },
+          { name: 'Time', value: `<t:${Math.floor(Date.now() / 1000)}:F>`, inline: false },
+          { name: 'Violation', value: [
+              hasText ? '– Sent text along with an image.' : '',
+              !hasImage ? '– No attached image found.' : ''
             ].join('\n').trim(), inline: false }
         );
 
@@ -59,18 +59,17 @@ client.on('messageCreate', async (message) => {
         if (attachments.length > 0) {
           for (const att of attachments) {
             await logChannel.send({
-              content: `Скріншот від <@${message.author.id}>:`,
+              content: `Screenshot from <@${message.author.id}>:`,
               files: [att.url]
             });
           }
         }
       }
-
     } catch (error) {
-      console.error('Помилка при обробці повідомлення:', error);
+      console.error('Error handling message:', error);
     }
   }
 });
 
-// Запуск бота
+// Start the bot
 client.login(process.env.TOKEN);
